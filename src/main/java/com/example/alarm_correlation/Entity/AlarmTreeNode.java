@@ -25,12 +25,8 @@ public class AlarmTreeNode {
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
-    private AlarmTreeNode parent;
-    
-    @Column(nullable = false)
-    private String type; 
+    private AlarmTreeNode parentId;
 
-    @Column(nullable = false)
-    private String status; 
+    private String mode;
 
 }
