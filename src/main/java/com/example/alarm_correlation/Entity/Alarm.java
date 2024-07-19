@@ -28,7 +28,7 @@ public class Alarm {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "class_id")
-    private AlarmTree alarmTree;
+    private AlarmTreeNode alarmTreeNode;
 
     @ManyToMany
     @JoinTable(name = "alarm_relationship",

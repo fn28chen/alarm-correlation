@@ -1,6 +1,8 @@
 package com.example.alarm_correlation.Entity;
 
 import jakarta.persistence.*;
+import java.lang.Long;
+
 import lombok.Data;
 
 @Entity
@@ -12,10 +14,11 @@ public class Relationship {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_alarm_id")
-    private Long parentAlarmId;
+    @JoinColumn(name = "parent_alarm")
+    private Alarm parentAlarm;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "child_alarm_id")
-    private Long childAlarmId;
+    @JoinColumn(name = "child_alarm")
+    private Alarm childAlarm;
+    
 }
