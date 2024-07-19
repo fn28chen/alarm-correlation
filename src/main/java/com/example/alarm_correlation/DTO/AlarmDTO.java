@@ -13,6 +13,7 @@ public class AlarmDTO {
     private String mode;
     private LocalDateTime createTime = LocalDateTime.now();
     private LocalDateTime updateTime = LocalDateTime.now();
+
+    private AlarmTreeNodeDTO alarmTreeNode;
     private Long classId;
-    
 }
