@@ -3,6 +3,7 @@ package com.example.alarm_correlation.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,6 +35,11 @@ public class AlarmTreeNodeController {
     @RequestMapping("/getChildId/{parentId}")
     public ResponseEntity<?> getChildId(@PathVariable int parentId) {
         return ResponseEntity.ok(alarmTreeNodeService.getChildId(parentId));
+    }
+
+    @PostMapping("/addAllParentsAndChildrenID/{nodeId}")
+    public ResponseEntity<?> findAllParentsAndChildrenID(@PathVariable int nodeId) {
+        return ResponseEntity.ok(alarmTreeNodeService.findAllParentsAndChildrenID(nodeId));
     }
 
     // Get table size

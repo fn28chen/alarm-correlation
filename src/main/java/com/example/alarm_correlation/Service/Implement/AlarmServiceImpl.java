@@ -36,8 +36,6 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public ResponseEntity<?> createAlarm(Alarm alarm) {
         alarmRepository.save(alarm);
-        alarmRepository.updateClassIdBasedOnName();
-
         return new ResponseEntity<>("Alarm has been created", HttpStatus.CREATED);
     }
 

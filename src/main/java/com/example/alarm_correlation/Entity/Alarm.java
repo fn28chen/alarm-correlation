@@ -1,5 +1,6 @@
 package com.example.alarm_correlation.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -24,10 +25,9 @@ public class Alarm {
         updateTime = LocalDateTime.now();
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "class_id", referencedColumnName = "id")
+    @JsonIgnore
+    @ManyToOne
     private AlarmTreeNode alarmTreeNode;
-
 }
 
 
