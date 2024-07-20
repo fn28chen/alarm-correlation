@@ -78,4 +78,9 @@ public class AlarmTreeNodeServiceImpl implements AlarmTreeNodeService {
     public long getTableSize() {
         return alarmTreeNodeRepository.getTableSize();
     }
+
+    @Override
+    public AlarmTreeNode findByName(String name) {
+        return alarmTreeNodeRepository.findByName(name);
+    }
 }

@@ -1,11 +1,10 @@
 package com.example.alarm_correlation.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "alarm")
@@ -26,15 +25,9 @@ public class Alarm {
         updateTime = LocalDateTime.now();
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "class_id")
+    @JsonIgnore
+    @ManyToOne
     private AlarmTreeNode alarmTreeNode;
-
-    @ManyToMany
-    @JoinTable(name = "alarm_relationship",
-            joinColumns = @JoinColumn(name = "alarm_id"),
-            inverseJoinColumns = @JoinColumn(name = "relationship_id"))
-    private List<Alarm> alarms = new ArrayList<>();
 }
 
 

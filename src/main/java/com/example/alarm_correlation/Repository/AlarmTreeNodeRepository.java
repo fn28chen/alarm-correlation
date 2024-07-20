@@ -20,6 +20,10 @@ public interface AlarmTreeNodeRepository extends JpaRepository<AlarmTreeNode, In
     @Query("SELECT a.id FROM AlarmTreeNode as a WHERE a.parentId = ?1")
     List<Integer> getChildId(int parentId);
 
+    // Find the AlarmTreeNode based on the Alarm's name
+    @Query("SELECT a FROM AlarmTreeNode as a WHERE a.name = ?1")
+    AlarmTreeNode findByName(String name);
+
     @Query("SELECT COUNT(*) FROM AlarmTreeNode")
     long getTableSize();
 }
