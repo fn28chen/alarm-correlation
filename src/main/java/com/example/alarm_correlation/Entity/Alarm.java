@@ -2,12 +2,18 @@ package com.example.alarm_correlation.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "alarm")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class Alarm {
     @Id
@@ -16,6 +22,7 @@ public class Alarm {
     private String name;
     private String state;
     private String mode;
+    private String description;
     private LocalDateTime createTime = LocalDateTime.now();
     private LocalDateTime updateTime = LocalDateTime.now();
 
@@ -28,9 +35,6 @@ public class Alarm {
     @ManyToOne
     private AlarmTreeNode alarmTreeNode;
 
-    public String getDescription() {
-        return alarmTreeNode != null ? alarmTreeNode.getDescription() : null;
-    }
 }
 
 
