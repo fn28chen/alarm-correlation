@@ -8,10 +8,10 @@ import java.util.List;
 
 @Service
 public interface AlarmTreeNodeService {
-    List<AlarmTreeNode> findByParentId(int parentId);
-    List<Integer> getParentId(int nodeId);
-    List<Integer> getChildId(int nodeId);
+    List<AlarmTreeNode> findByParentId(Long parentId);
+    List<Long> getParentId(Long nodeId);
+    List<Long> getChildId(Long nodeId);
     AlarmTreeNode findByName(String name);
-    List<Integer> findAllParentsAndChildrenID(int nodeId);
+    List<Long> findAllParentsAndChildrenID(Long nodeId);
     long getTableSize();
 }

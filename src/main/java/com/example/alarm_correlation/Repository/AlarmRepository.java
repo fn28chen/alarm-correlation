@@ -9,10 +9,6 @@ import java.util.List;
 
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 
-    // Update alarm class_id by alarm_tree_node id
-    @Query(value = "UPDATE Alarm a SET a.classId = (SELECT atn.id FROM AlarmTreeNode atn WHERE atn.name = a.name) WHERE a.classId IS NULL LIMIT 1", nativeQuery = true)
-    int updateClassIdBasedOnName(Alarm alarm);
-
     // Get all alarms and their information and class id from id of AlarmTreeNode where AlarmTreeNode.name = Alarm.alarmTreeNode.name
     @Query(value = "SELECT a FROM Alarm as a")
     List<Alarm> findAllAlarms();

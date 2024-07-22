@@ -8,5 +8,6 @@ public class AlarmTreeNodeDTO {
     private String name;
     private String description;
     private String mode;
+    private int position;
     private Long parentId;
 }

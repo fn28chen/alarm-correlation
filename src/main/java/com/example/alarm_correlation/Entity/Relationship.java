@@ -13,11 +13,11 @@ public class Relationship {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "parent_alarm")
     private Alarm parentAlarm;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "child_alarm")
     private Alarm childAlarm;
     
