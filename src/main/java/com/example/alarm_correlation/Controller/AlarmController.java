@@ -1,12 +1,12 @@
 package com.example.alarm_correlation.Controller;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
+import com.example.alarm_correlation.Repository.AlarmRepository;
+import com.example.alarm_correlation.Repository.AlarmTreeNodeRepository;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,15 +21,13 @@ import com.example.alarm_correlation.Service.AlarmService;
 import com.example.alarm_correlation.Service.AlarmTreeNodeService;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/alarm")
 public class AlarmController {
     private final AlarmService alarmService;
     private final AlarmTreeNodeService alarmTreeNodeService;
-
-    public AlarmController(AlarmService alarmService, AlarmTreeNodeService alarmTreeNodeService) {
-        this.alarmService = alarmService;
-        this.alarmTreeNodeService = alarmTreeNodeService;
-    }
+    private final AlarmTreeNodeRepository alarmTreeNodeRepository;
+    private final AlarmRepository alarmRepository;
 
     // Get all alarm information
     @RequestMapping("/findAll")
@@ -49,19 +47,13 @@ public class AlarmController {
         Queue<Long> queue = new LinkedList<>();
         Set<Long> visited = new HashSet<>();
         List<Long> result = new ArrayList<>();
+
         queue.add(nodeId);
         visited.add(nodeId);
+
         while (!queue.isEmpty()) {
             Long current = queue.poll();
             result.add(current);
-            List<Long> parents = alarmTreeNodeService.getParentId(current);
-            for (Long parent : parents) {
-                if (!visited.contains(parent)) {
-                    queue.add(parent);
-                    visited.add(parent);
-                }
-            }
-            
             List<Long> children = alarmTreeNodeService.getChildId(current);
             for (Long child : children) {
                 if (!visited.contains(child)) {
@@ -69,12 +61,42 @@ public class AlarmController {
                     visited.add(child);
                 }
             }
-            
         }
-        return ResponseEntity.ok(result);
+
+        queue.add(nodeId);
+
+        while (!queue.isEmpty()) {
+            Long current = queue.poll();
+            if(!Objects.equals(nodeId, current)) {
+                result.add(current);
+            }
+
+            List<Long> parents = alarmTreeNodeService.getParentId(current);
+            for(Long parent : parents) {
+                if(!visited.contains(parent)) {
+                    queue.add(parent);
+                    visited.add(parent);
+                }
+            }
+        }
+
+        List<AlarmTreeNode> listResult = new ArrayList<>();
+        for(Long id : result) {
+            try {
+                Optional<AlarmTreeNode> a = alarmTreeNodeRepository.findById(id);
+                if(a.isPresent()) {
+                    Alarm alarm = Alarm.builder().id(id).name(a.get().getName()).mode(a.get().getMode()).description(a.get().getDescription()).state("INIT").createTime(LocalDateTime.now()).updateTime(LocalDateTime.now()).alarmTreeNode(a.get()).build();
+                    alarmRepository.save(alarm);
+                }
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body("Error: " + e);
+            }
+        }
+
+        return ResponseEntity.ok(listResult);
     }
 
-    // Create a new alarm
+//     Create a new alarm
     @PostMapping("/create")
     public ResponseEntity<?> createAlarm(@RequestBody AlarmDTO alarmDTO) {
         try {
@@ -87,7 +109,7 @@ public class AlarmController {
     
     private Alarm mapAlarm(AlarmDTO alarmDTO) {
         Alarm alarm = new Alarm();
-        
+
         AlarmTreeNode alarmTreeNode = alarmTreeNodeService.findByName(alarmDTO.getName());
 
         alarm.setName(alarmDTO.getName());
