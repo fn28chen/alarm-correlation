@@ -2,7 +2,7 @@ package com.example.alarm_correlation.Service.Implement;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +12,9 @@ import com.example.alarm_correlation.Service.AlarmService;
 
 @Service
 public class AlarmServiceImpl implements AlarmService {
-    private final AlarmRepository alarmRepository;
 
-    public AlarmServiceImpl(AlarmRepository alarmRepository) {
-        this.alarmRepository = alarmRepository;
-    }
+    @Autowired
+    AlarmRepository alarmRepository;
 
     @Override
     public ResponseEntity<?> findAlarmById(Long id) {
@@ -36,7 +34,7 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public ResponseEntity<?> createAlarm(Alarm alarm) {
         alarmRepository.save(alarm);
-        return new ResponseEntity<>("Alarm has been created", HttpStatus.CREATED);
+        return ResponseEntity.ok(alarm);
     }
 
     @Override

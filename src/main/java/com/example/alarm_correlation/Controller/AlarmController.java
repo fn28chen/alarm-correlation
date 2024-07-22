@@ -1,7 +1,12 @@
 package com.example.alarm_correlation.Controller;
 
-import com.example.alarm_correlation.DTO.AlarmTreeNodeDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +26,6 @@ public class AlarmController {
     private final AlarmService alarmService;
     private final AlarmTreeNodeService alarmTreeNodeService;
 
-    @Autowired
     public AlarmController(AlarmService alarmService, AlarmTreeNodeService alarmTreeNodeService) {
         this.alarmService = alarmService;
         this.alarmTreeNodeService = alarmTreeNodeService;
@@ -39,21 +43,54 @@ public class AlarmController {
         return ResponseEntity.ok(alarmService.findAlarmById(id));
     }
 
+    // BFS function to add all parent and children of a node after create alarm
+    @RequestMapping("/addAllParentsAndChildrenID/{nodeId}")
+    public ResponseEntity<?> addAllParentsAndChildrenID(@PathVariable Long nodeId) {
+        Queue<Long> queue = new LinkedList<>();
+        Set<Long> visited = new HashSet<>();
+        List<Long> result = new ArrayList<>();
+        queue.add(nodeId);
+        visited.add(nodeId);
+        while (!queue.isEmpty()) {
+            Long current = queue.poll();
+            result.add(current);
+            List<Long> parents = alarmTreeNodeService.getParentId(current);
+            for (Long parent : parents) {
+                if (!visited.contains(parent)) {
+                    queue.add(parent);
+                    visited.add(parent);
+                }
+            }
+            
+            List<Long> children = alarmTreeNodeService.getChildId(current);
+            for (Long child : children) {
+                if (!visited.contains(child)) {
+                    queue.add(child);
+                    visited.add(child);
+                }
+            }
+            
+        }
+        return ResponseEntity.ok(result);
+    }
+
     // Create a new alarm
     @PostMapping("/create")
     public ResponseEntity<?> createAlarm(@RequestBody AlarmDTO alarmDTO) {
-        return alarmService.createAlarm(mapAlarm(alarmDTO));
+        try {
+            Alarm alarm = mapAlarm(alarmDTO);
+            return ResponseEntity.ok(alarmService.createAlarm(alarm));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e);
+        }
     }
-
+    
     private Alarm mapAlarm(AlarmDTO alarmDTO) {
         Alarm alarm = new Alarm();
-        // From alarm name, search and compare with alarmTreeNode's name, if it is equal, then get class_id and set it to alarm
+        
         AlarmTreeNode alarmTreeNode = alarmTreeNodeService.findByName(alarmDTO.getName());
-        // Check the AlarmTreeNode's content
-        System.out.println(alarmTreeNode);
 
         alarm.setName(alarmDTO.getName());
-        alarm.setDescription(alarmDTO.getDescription());
         alarm.setState(alarmDTO.getState());
         alarm.setMode(alarmDTO.getMode().toString());
         alarm.setCreateTime(alarmDTO.getCreateTime());
@@ -61,6 +98,18 @@ public class AlarmController {
         alarm.setAlarmTreeNode(alarmTreeNode);
 
         return alarm;
+    }
+
+    // Get all child node's information of current node
+    @RequestMapping("/getParentId/{nodeId}")
+    public ResponseEntity<?> getParentId(@PathVariable Long nodeId) {
+        return ResponseEntity.ok(alarmTreeNodeService.getParentId(nodeId));
+    }
+
+    // Get all child node's ID of current node
+    @RequestMapping("/getChildId/{parentId}")
+    public ResponseEntity<?> getChildId(@PathVariable Long parentId) {
+        return ResponseEntity.ok(alarmTreeNodeService.getChildId(parentId));
     }
 
 }

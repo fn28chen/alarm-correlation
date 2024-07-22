@@ -4,25 +4,26 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.example.alarm_correlation.Entity.AlarmTreeNode;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
 public interface AlarmTreeNodeRepository extends JpaRepository<AlarmTreeNode, Integer> {
     // Get all child node's information of current node
-    @Query("SELECT a FROM AlarmTreeNode as a WHERE a.parentId = ?1")
-    List<AlarmTreeNode> findByParentId(int parentId);
+    @Query(value = "SELECT * FROM alarm_tree_node as a WHERE a.parentId = :id", nativeQuery = true)
+    List<AlarmTreeNode> findByParentId(@Param("id") Long parentId);
 
-    // Get parentID of current node
-    @Query("SELECT a.parentId FROM AlarmTreeNode as a WHERE a.id = ?1")
-    List<Integer> getParentId(int nodeId);
+    // Get parent node's ID of current node
+    @Query(value = "SELECT a.parent_id FROM alarm_tree_node as a WHERE a.id = :id", nativeQuery = true)
+    List<Long> getParentId(@Param("id") Long nodeId);
 
     // Get all child node's ID of current node
-    @Query("SELECT a.id FROM AlarmTreeNode as a WHERE a.parentId = ?1")
-    List<Integer> getChildId(int parentId);
+    @Query(value = "SELECT a.id FROM alarm_tree_node as a WHERE a.parent_id = :id", nativeQuery = true)
+    List<Long> getChildId(@Param("id") Long parentId);
 
     // Find the AlarmTreeNode based on the Alarm's name
-    @Query("SELECT a FROM AlarmTreeNode as a WHERE a.name = ?1")
-    AlarmTreeNode findByName(String name);
+    @Query(value = "SELECT * FROM alarm_tree_node as a WHERE a.name = ?1", nativeQuery = true)
+    AlarmTreeNode findByName(@Param("name") String name);
 
     @Query("SELECT COUNT(*) FROM AlarmTreeNode")
     long getTableSize();

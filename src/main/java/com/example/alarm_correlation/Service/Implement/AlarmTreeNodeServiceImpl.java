@@ -17,68 +17,63 @@ import java.util.Set;
 @Service
 public class AlarmTreeNodeServiceImpl implements AlarmTreeNodeService {
 
-    private final AlarmTreeNodeRepository alarmTreeNodeRepository;
-
     @Autowired
-    public AlarmTreeNodeServiceImpl(AlarmTreeNodeRepository alarmTreeNodeRepository) {
-        this.alarmTreeNodeRepository = alarmTreeNodeRepository;
-    }
-
-    // BFS function to find all parent and children of a node
-    public List<Integer> findAllParentsAndChildrenID(int nodeId) {
-        List<Integer> result = new ArrayList<>();
-        Queue<Integer> queue = new LinkedList<>();
-        Set<Integer> visited = new HashSet<>();
-
-        queue.offer(nodeId);
-        visited.add(nodeId);
-        result.add(nodeId);
-
-        // Instead of it, if want to find child, check the parentId, if it is equal to nodeId, then it is child
-        while (!queue.isEmpty()) {
-            int current = queue.poll();
-            List<Integer> children = getChildId(current);
-            for (int child : children) {
-                if (!visited.contains(child)) {
-                    queue.offer(child);
-                    visited.add(child);
-                    result.add(child);
-                }
-            }
-
-            List<Integer> parent = getParentId(current);
-            for (int p : parent) {
-                if (!visited.contains(p)) {
-                    queue.offer(p);
-                    visited.add(p);
-                    result.add(p);
-                }
-            }
-        }
-
-        return result;
-    }
+    AlarmTreeNodeRepository alarmTreeNodeRepository;
 
     @Override
-    public List<AlarmTreeNode> findByParentId(int parentId) {
+    public List<AlarmTreeNode> findByParentId(Long parentId) {
         return alarmTreeNodeRepository.findByParentId(parentId);
     }
 
+    // Find and add all parents and children of current node to the list
     @Override
-    public List<Integer> getParentId(int nodeId) {
+    public List<Long> findAllParentsAndChildrenID(Long nodeId) {
+        List<Long> result = new ArrayList<>();
+        Queue<Long> queue = new LinkedList<>();
+        Set<Long> visited = new HashSet<>(); 
+        
+        queue.add(nodeId);
+        visited.add(nodeId);
+        while (!queue.isEmpty()) {
+            Long current = queue.poll();
+            result.add(current);
+            List<Long> children = alarmTreeNodeRepository.getChildId(current);
+            for (Long child : children) {
+                if (!visited.contains(child)) {
+                    queue.add(child);
+                    visited.add(child);
+                }
+            }
+            List<Long> parents = alarmTreeNodeRepository.getParentId(current);
+            for (Long parent : parents) {
+                if (!visited.contains(parent)) {
+                    queue.add(parent);
+                    visited.add(parent);
+                }
+            }
+        }
+        return result;
+    }
+
+    // Get parent node's ID of current node
+    @Override
+    public List<Long> getParentId(Long nodeId) {
         return alarmTreeNodeRepository.getParentId(nodeId);
     }
 
+    // Get all child node's ID of current node
     @Override
-    public List<Integer> getChildId(int nodeId) {
+    public List<Long> getChildId(Long nodeId) {
         return alarmTreeNodeRepository.getChildId(nodeId);
     }
 
+    // Get table size of alarm_tree_node
     @Override
     public long getTableSize() {
         return alarmTreeNodeRepository.getTableSize();
     }
 
+    // Find the AlarmTreeNode based on the Alarm's name
     @Override
     public AlarmTreeNode findByName(String name) {
         return alarmTreeNodeRepository.findByName(name);

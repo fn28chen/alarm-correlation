@@ -14,7 +14,6 @@ public class Alarm {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String description;
     private String state;
     private String mode;
     private LocalDateTime createTime = LocalDateTime.now();
@@ -28,6 +27,10 @@ public class Alarm {
     @JsonIgnore
     @ManyToOne
     private AlarmTreeNode alarmTreeNode;
+
+    public String getDescription() {
+        return alarmTreeNode != null ? alarmTreeNode.getDescription() : null;
+    }
 }
 
 

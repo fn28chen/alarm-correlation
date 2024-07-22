@@ -21,6 +21,9 @@ public class AlarmTreeNode {
     private String name;
 
     @Column(nullable = false)
+    private String description;
+
+    @Column(nullable = false)
     private int position;
 
     @ManyToOne
@@ -28,5 +31,13 @@ public class AlarmTreeNode {
     private AlarmTreeNode parentId;
 
     private String mode;
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 
 }
