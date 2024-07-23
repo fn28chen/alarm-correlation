@@ -12,6 +12,6 @@ public interface AlarmTreeNodeService {
     List<Long> getParentId(Long nodeId);
     List<Long> getChildId(Long nodeId);
     AlarmTreeNode findByName(String name);
-    List<Long> findAllParentsAndChildrenID(Long nodeId);
+//    List<Long> findAllParentsAndChildrenID(Long nodeId);
     long getTableSize();
 }

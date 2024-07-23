@@ -41,12 +41,39 @@ public class AlarmController {
         return ResponseEntity.ok(alarmService.findAlarmById(id));
     }
 
+    // Create a new alarm
+    @PostMapping("/create")
+    public ResponseEntity<?> createAlarm(@RequestBody AlarmDTO alarmDTO) {
+        try {
+            Alarm alarm = mapAlarm(alarmDTO);
+            return ResponseEntity.ok(alarmService.createAlarm(alarm));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e);
+        }
+    }
+
+    private Alarm mapAlarm(AlarmDTO alarmDTO) {
+        Alarm alarm = new Alarm();
+
+        AlarmTreeNode alarmTreeNode = alarmTreeNodeService.findByName(alarmDTO.getName());
+
+        alarm.setName(alarmDTO.getName());
+        alarm.setState(alarmDTO.getState());
+        alarm.setMode(alarmDTO.getMode().toString());
+        alarm.setCreateTime(alarmDTO.getCreateTime());
+        alarm.setUpdateTime(alarmDTO.getUpdateTime());
+        alarm.setAlarmTreeNode(alarmTreeNode);
+
+        return alarm;
+    }
+
     // BFS function to add all parent and children of a node after create alarm
     @RequestMapping("/addAllParentsAndChildrenID/{nodeId}")
     public ResponseEntity<?> addAllParentsAndChildrenID(@PathVariable Long nodeId) {
+
+        List<Long> result = new ArrayList<>();
         Queue<Long> queue = new LinkedList<>();
         Set<Long> visited = new HashSet<>();
-        List<Long> result = new ArrayList<>();
 
         queue.add(nodeId);
         visited.add(nodeId);
@@ -83,9 +110,19 @@ public class AlarmController {
         List<AlarmTreeNode> listResult = new ArrayList<>();
         for(Long id : result) {
             try {
+                listResult.add(alarmTreeNodeRepository.findById(id).get());
                 Optional<AlarmTreeNode> a = alarmTreeNodeRepository.findById(id);
                 if(a.isPresent()) {
-                    Alarm alarm = Alarm.builder().id(id).name(a.get().getName()).mode(a.get().getMode()).description(a.get().getDescription()).state("INIT").createTime(LocalDateTime.now()).updateTime(LocalDateTime.now()).alarmTreeNode(a.get()).build();
+                    Alarm alarm = Alarm.builder()
+                            .id(id)
+                            .name(a.get().getName())
+                            .mode(a.get().getMode())
+                            .description(a.get().getDescription())
+                            .state("INIT")
+                            .createTime(LocalDateTime.now())
+                            .updateTime(LocalDateTime.now())
+                            .alarmTreeNode(a.get())
+                            .build();
                     alarmRepository.save(alarm);
                 }
             } catch (Exception e) {
@@ -94,32 +131,6 @@ public class AlarmController {
         }
 
         return ResponseEntity.ok(listResult);
-    }
-
-//     Create a new alarm
-    @PostMapping("/create")
-    public ResponseEntity<?> createAlarm(@RequestBody AlarmDTO alarmDTO) {
-        try {
-            Alarm alarm = mapAlarm(alarmDTO);
-            return ResponseEntity.ok(alarmService.createAlarm(alarm));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e);
-        }
-    }
-    
-    private Alarm mapAlarm(AlarmDTO alarmDTO) {
-        Alarm alarm = new Alarm();
-
-        AlarmTreeNode alarmTreeNode = alarmTreeNodeService.findByName(alarmDTO.getName());
-
-        alarm.setName(alarmDTO.getName());
-        alarm.setState(alarmDTO.getState());
-        alarm.setMode(alarmDTO.getMode().toString());
-        alarm.setCreateTime(alarmDTO.getCreateTime());
-        alarm.setUpdateTime(alarmDTO.getUpdateTime());
-        alarm.setAlarmTreeNode(alarmTreeNode);
-
-        return alarm;
     }
 
     // Get all child node's information of current node
@@ -133,5 +144,20 @@ public class AlarmController {
     public ResponseEntity<?> getChildId(@PathVariable Long parentId) {
         return ResponseEntity.ok(alarmTreeNodeService.getChildId(parentId));
     }
+
+    // Update Alarm State
+    @RequestMapping("/updateAlarmState/{id}")
+    public ResponseEntity<?> updateAlarmState(@PathVariable Long id, @RequestBody AlarmDTO alarmDTO) {
+        return ResponseEntity.ok(alarmService.updateAlarmState(
+                id,
+                alarmDTO.getState(),
+                alarmDTO.getUpdateTime()
+        ));
+    }
+
+//    @RequestMapping("/display")
+//    public ResponseEntity<?> display() {
+//        return ResponseEntity.ok(alarmTreeNodeService.display());
+//    }
 
 }
