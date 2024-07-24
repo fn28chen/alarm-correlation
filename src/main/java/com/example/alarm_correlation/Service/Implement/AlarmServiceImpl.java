@@ -13,7 +13,8 @@ import java.util.Set;
 import com.example.alarm_correlation.DTO.AlarmDTO;
 
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -25,25 +26,12 @@ import com.example.alarm_correlation.Service.AlarmService;
 import com.example.alarm_correlation.Service.AlarmTreeNodeService;
 
 @Service
+@RequiredArgsConstructor
 public class AlarmServiceImpl implements AlarmService {
 
-    @Autowired
-    AlarmRepository alarmRepository;
-    @Autowired
-    AlarmTreeNodeService alarmTreeNodeService;
-    @Autowired
-    AlarmTreeNodeRepository alarmTreeNodeRepository;
-
-    @Getter
-    static class ResponseDTO {
-        private final Long nodeId;
-        private final List<Long> result;
-
-        public ResponseDTO(Long nodeId, List<Long> result) {
-            this.nodeId = nodeId;
-            this.result = result;
-        }
-    }
+    private final AlarmRepository alarmRepository;
+    private final AlarmTreeNodeService alarmTreeNodeService;
+    private final AlarmTreeNodeRepository alarmTreeNodeRepository;
 
     @Override
     public ResponseEntity<?> findAlarmById(Long id) {

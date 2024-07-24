@@ -4,17 +4,17 @@ import com.example.alarm_correlation.Entity.AlarmTreeNode;
 import com.example.alarm_correlation.Repository.AlarmTreeNodeRepository;
 import com.example.alarm_correlation.Service.AlarmTreeNodeService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class AlarmTreeNodeServiceImpl implements AlarmTreeNodeService {
 
-    @Autowired
-    AlarmTreeNodeRepository alarmTreeNodeRepository;
-    AlarmTreeNodeService alarmTreeNodeService;
+    private final AlarmTreeNodeRepository alarmTreeNodeRepository;
 
     @Override
     public List<AlarmTreeNode> findByParentId(Long parentId) {

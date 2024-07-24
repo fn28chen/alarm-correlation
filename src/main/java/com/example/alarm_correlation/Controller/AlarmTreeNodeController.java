@@ -1,6 +1,5 @@
 package com.example.alarm_correlation.Controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,15 +7,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.alarm_correlation.Service.AlarmTreeNodeService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/alarmTree")
 public class AlarmTreeNodeController {
     private final AlarmTreeNodeService alarmTreeNodeService;
-
-    @Autowired
-    public AlarmTreeNodeController(AlarmTreeNodeService alarmTreeNodeService) {
-        this.alarmTreeNodeService = alarmTreeNodeService;
-    }
 
     // Get all child node's information of current node
     @RequestMapping("/findByParentId/{parentId}")
