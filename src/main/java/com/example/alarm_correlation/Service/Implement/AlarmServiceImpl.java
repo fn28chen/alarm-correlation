@@ -1,5 +1,6 @@
 package com.example.alarm_correlation.Service.Implement;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +43,14 @@ public class AlarmServiceImpl implements AlarmService {
         return ResponseEntity.ok(alarmRepository.save(alarm));
     }
 
-//    @Override
-//    public ResponseEntity<?> updateAlarmState(Long id, String state) {
-//
-//    }
+    @Override
+    public ResponseEntity<?> updateAlarmState(Long id, String state, LocalDateTime updateTime) {
+        Alarm alarm = alarmRepository.findById(id).get();
+        alarm.setState(state);
+        alarm.setUpdateTime(updateTime);
+        alarmRepository.save(alarm);
+        return ResponseEntity.ok(alarm);
+    }
 
     @Override
     public ResponseEntity<?> deleteAlarm(Long id) {
