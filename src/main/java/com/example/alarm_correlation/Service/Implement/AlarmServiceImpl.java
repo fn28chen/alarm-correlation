@@ -12,7 +12,6 @@ import java.util.Set;
 
 import com.example.alarm_correlation.DTO.AlarmDTO;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -55,7 +54,7 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     @Override
-    public ResponseEntity<?> addAllParentsAndChildrenID(Long id) {
+    public ResponseEntity<?> addAllParentsAndChildren(Long id) {
         List<Long> result = new ArrayList<>();
         Queue<Long> queue = new LinkedList<>();
         Set<Long> visited = new HashSet<>();
@@ -65,7 +64,9 @@ public class AlarmServiceImpl implements AlarmService {
 
         while (!queue.isEmpty()) {
             Long current = queue.poll();
-            result.add(current);
+            if (!Objects.equals(id, current)) {
+                result.add(current);
+            }
             List<Long> children = alarmTreeNodeService.getChildId(current);
             for (Long child : children) {
                 Optional<AlarmTreeNode> a = alarmTreeNodeRepository.findById(child);
@@ -88,7 +89,7 @@ public class AlarmServiceImpl implements AlarmService {
         
             List<Long> parents = alarmTreeNodeService.getParentId(current);
             Optional<AlarmTreeNode> currentAlarm = alarmTreeNodeRepository.findById(current);
-            if(currentAlarm.get().getName().equals("RRU Disconnected") 
+            if(currentAlarm.get().getName().equals("RRU Disconnected")
             && !visited.contains(6L) && !visited.contains(7L)){
                 if (!visited.contains(6L)) {
                     Optional<AlarmTreeNode> al6 = alarmTreeNodeRepository.findById(6L);
@@ -128,28 +129,26 @@ public class AlarmServiceImpl implements AlarmService {
 
         List<AlarmTreeNode> listResult = new ArrayList<>();
         for(Long idResult : result) {
-            try {
-                listResult.add(alarmTreeNodeRepository.findById(id).get());
-                Optional<AlarmTreeNode> a = alarmTreeNodeRepository.findById(idResult);
-                if(a.isPresent()) {
-                    Alarm alarm = Alarm.builder()
-                            .id(id)
-                            .name(a.get().getName())
-                            .mode(a.get().getMode())
-                            .description(a.get().getDescription())
-                            .state("INIT")
-                            .createTime(LocalDateTime.now())
-                            .updateTime(LocalDateTime.now())
-                            .alarmTreeNode(a.get())
-                            .build();
-                    alarmRepository.save(alarm);
-                }
-            } catch (Exception e) {
-                return ResponseEntity.badRequest().body("Error: " + e);
+            listResult.add(alarmTreeNodeRepository.findById(id).get());
+            Optional<AlarmTreeNode> a = alarmTreeNodeRepository.findById(idResult);
+            if(a.isPresent()) {
+                Alarm alarm = Alarm.builder()
+                        .id(id)
+                        .name(a.get().getName())
+                        .mode(a.get().getMode())
+                        .description(a.get().getDescription())
+                        .state("INIT")
+                        .createTime(LocalDateTime.now())
+                        .updateTime(LocalDateTime.now())
+                        .alarmTreeNode(a.get())
+                        .build();
+                alarmRepository.save(alarm);
             }
         }
 
-        return ResponseEntity.ok(listResult);
+        // I want to return result and listResult at the same time
+        return ResponseEntity.ok(result);
+
     }
 
     @Override
@@ -241,42 +240,44 @@ public class AlarmServiceImpl implements AlarmService {
                 }
 
                 for(Long idResult : result) {
-                    try {
-                        listResult.add(alarmTreeNodeRepository.findById(idResult).get());
-                        Optional<AlarmTreeNode> a = alarmTreeNodeRepository.findById(idResult);
-                        if(a.isPresent()) {
-                            if(a.get().getId() == nodeId) {
-                                Alarm alarmResult = Alarm.builder()
-                                        .id(id)
-                                        .name(a.get().getName())
-                                        .mode(a.get().getMode())
-                                        .description(a.get().getDescription())
-                                        .state("DONE")
-                                        .createTime(LocalDateTime.now())
-                                        .updateTime(LocalDateTime.now())
-                                        .alarmTreeNode(a.get())
-                                        .build();
-                                alarmRepository.save(alarmResult);
-                            } else {
-                                Alarm alarmResult = Alarm.builder()
-                                        .id(idResult)
-                                        .name(a.get().getName())
-                                        .mode(a.get().getMode())
-                                        .description(a.get().getDescription())
-                                        .state("INIT")
-                                        .createTime(LocalDateTime.now())
-                                        .updateTime(LocalDateTime.now())
-                                        .alarmTreeNode(a.get())
-                                        .build();
-                                alarmRepository.save(alarmResult);
-                            }
+                    listResult.add(alarmTreeNodeRepository.findById(idResult).get());
+                    Optional<AlarmTreeNode> a = alarmTreeNodeRepository.findById(idResult);
+                    if(a.isPresent()) {
+                        if(a.get().getId() == nodeId) {
+                            Alarm alarmResult = Alarm.builder()
+                                    .id(id)
+                                    .name(a.get().getName())
+                                    .mode(a.get().getMode())
+                                    .description(a.get().getDescription())
+                                    .state("DONE")
+                                    .createTime(LocalDateTime.now())
+                                    .updateTime(LocalDateTime.now())
+                                    .alarmTreeNode(a.get())
+                                    .build();
+                            alarmRepository.save(alarmResult);
+                        } else {
+                            Alarm alarmResult = Alarm.builder()
+                                    .id(idResult)
+                                    .name(a.get().getName())
+                                    .mode(a.get().getMode())
+                                    .description(a.get().getDescription())
+                                    .state("INIT")
+                                    .createTime(LocalDateTime.now())
+                                    .updateTime(LocalDateTime.now())
+                                    .alarmTreeNode(a.get())
+                                    .build();
+                            alarmRepository.save(alarmResult);
                         }
-                    } catch (Exception e) {
-                        return ResponseEntity.badRequest().body("Error: " + e);
-                    }
+                    }     
                 }
             }
-
+        } else if(alarmDTO.getState().equals("CHANGE")) {
+            // if state change to CHANGE
+            // set state to change and set update time
+            alarm.setState("CHANGE");
+            alarm.setUpdateTime(LocalDateTime.now());
+            alarmRepository.save(alarm);
+            return ResponseEntity.ok(alarm);
         }
 
         return ResponseEntity.ok(listResult);

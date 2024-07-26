@@ -47,9 +47,9 @@ public class AlarmController {
     }
 
     // BFS function to add all parent and children of a node after create alarm
-    @RequestMapping("/addAllParentsAndChildrenID/{nodeId}")
-    public ResponseEntity<?> addAllParentsAndChildrenID(@PathVariable Long nodeId) {
-        return ResponseEntity.ok(alarmService.addAllParentsAndChildrenID(nodeId));
+    @RequestMapping("/addAllParentsAndChildren/{nodeId}")
+    public ResponseEntity<?> addAllParentsAndChildren(@PathVariable Long nodeId) {
+        return ResponseEntity.ok(alarmService.addAllParentsAndChildren(nodeId));
     }
 
     // Get all child node's information of current node
@@ -79,6 +79,7 @@ public class AlarmController {
         alarm.setName(alarmDTO.getName());
         alarm.setState(alarmDTO.getState());
         alarm.setMode(alarmDTO.getMode().toString());
+        alarm.setDescription(alarmDTO.getDescription());
         alarm.setCreateTime(alarmDTO.getCreateTime());
         alarm.setUpdateTime(alarmDTO.getUpdateTime());
         alarm.setAlarmTreeNode(alarmTreeNode);
