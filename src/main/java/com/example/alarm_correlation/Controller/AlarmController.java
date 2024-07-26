@@ -3,6 +3,7 @@ package com.example.alarm_correlation.Controller;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,9 +48,9 @@ public class AlarmController {
     }
 
     // BFS function to add all parent and children of a node after create alarm
-    @RequestMapping("/addAllParentsAndChildrenID/{nodeId}")
-    public ResponseEntity<?> addAllParentsAndChildrenID(@PathVariable Long nodeId) {
-        return ResponseEntity.ok(alarmService.addAllParentsAndChildrenID(nodeId));
+    @RequestMapping("/addAllParentsAndChildren/{nodeId}")
+    public ResponseEntity<?> addAllParentsAndChildren(@PathVariable Long nodeId) {
+        return ResponseEntity.ok(alarmService.addAllParentsAndChildren(nodeId));
     }
 
     // Get all child node's information of current node
@@ -70,6 +71,12 @@ public class AlarmController {
         return ResponseEntity.ok(alarmService.updateAlarmState(id, alarmDTO));
     }
 
+    // Delete Alarm
+    @DeleteMapping("/deleteAlarm/{id}")
+    public ResponseEntity<?> deleteAlarm(@PathVariable Long id) {
+        return ResponseEntity.ok(alarmService.deleteAlarm(id));
+    }
+
     // mapper AlarmDTO
     private Alarm mapAlarm(AlarmDTO alarmDTO) {
         Alarm alarm = new Alarm();
@@ -79,6 +86,7 @@ public class AlarmController {
         alarm.setName(alarmDTO.getName());
         alarm.setState(alarmDTO.getState());
         alarm.setMode(alarmDTO.getMode().toString());
+        alarm.setDescription(alarmDTO.getDescription());
         alarm.setCreateTime(alarmDTO.getCreateTime());
         alarm.setUpdateTime(alarmDTO.getUpdateTime());
         alarm.setAlarmTreeNode(alarmTreeNode);

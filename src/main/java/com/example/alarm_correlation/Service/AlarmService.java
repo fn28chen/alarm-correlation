@@ -12,7 +12,7 @@ import java.util.List;
 public interface AlarmService {
     public Long getIdFindByName(String name);
     public ResponseEntity<?> createAlarm(Alarm alarm);
-    public ResponseEntity<?> addAllParentsAndChildrenID(Long id);
+    public ResponseEntity<?> addAllParentsAndChildren(Long id);
     public ResponseEntity<?> findAlarmById(Long id);
     public List<Alarm> findAllAlarms();
     public ResponseEntity<?> updateAlarm(Alarm alarm);
