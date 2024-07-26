@@ -59,6 +59,10 @@ public class AlarmServiceImpl implements AlarmService {
         Queue<Long> queue = new LinkedList<>();
         Set<Long> visited = new HashSet<>();
 
+        if(id==10L) {
+            id = 9L;
+        }
+
         queue.add(id);
         visited.add(id);
 
@@ -174,6 +178,10 @@ public class AlarmServiceImpl implements AlarmService {
             Optional<Alarm> alarm_optional = alarmRepository.findById(id);
             Long nodeId = alarm_optional.get().getAlarmTreeNode().getId();
 
+            if(nodeId==10L) {
+                nodeId = 9L;
+            }
+
             queue.add(nodeId);
             visited.add(nodeId);
 
@@ -288,6 +296,9 @@ public class AlarmServiceImpl implements AlarmService {
     public ResponseEntity<?> deleteAlarm(Long id) {
         // if alarm has state DONE, it can be deleted
         Optional<Alarm> alarm = alarmRepository.findById(id);
+        if(!alarm.get().getState().equals("DONE")) {
+            return ResponseEntity.badRequest().body("Alarm state is not DONE");
+        }
         alarmRepository.deleteById(id);
         return ResponseEntity.ok(alarm);
     }
