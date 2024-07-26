@@ -250,7 +250,7 @@ public class AlarmServiceImpl implements AlarmService {
                                     .mode(a.get().getMode())
                                     .description(a.get().getDescription())
                                     .state("DONE")
-                                    .createTime(LocalDateTime.now())
+                                    .createTime(alarm.getCreateTime()) // Keep the original createTime
                                     .updateTime(LocalDateTime.now())
                                     .alarmTreeNode(a.get())
                                     .build();
@@ -262,7 +262,7 @@ public class AlarmServiceImpl implements AlarmService {
                                     .mode(a.get().getMode())
                                     .description(a.get().getDescription())
                                     .state("INIT")
-                                    .createTime(LocalDateTime.now())
+                                    .createTime(alarm.getCreateTime()) // Set the createTime to current time
                                     .updateTime(LocalDateTime.now())
                                     .alarmTreeNode(a.get())
                                     .build();
@@ -286,7 +286,9 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public ResponseEntity<?> deleteAlarm(Long id) {
+        // if alarm has state DONE, it can be deleted
+        Optional<Alarm> alarm = alarmRepository.findById(id);
         alarmRepository.deleteById(id);
-        return ResponseEntity.ok("Alarm with id " + id + " has been deleted");
+        return ResponseEntity.ok(alarm);
     }
 }

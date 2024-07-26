@@ -3,6 +3,7 @@ package com.example.alarm_correlation.Controller;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -68,6 +69,12 @@ public class AlarmController {
     @RequestMapping("/updateAlarmState/{id}")
     public ResponseEntity<?> updateAlarmState(@PathVariable Long id, @RequestBody AlarmDTO alarmDTO) {
         return ResponseEntity.ok(alarmService.updateAlarmState(id, alarmDTO));
+    }
+
+    // Delete Alarm
+    @DeleteMapping("/deleteAlarm/{id}")
+    public ResponseEntity<?> deleteAlarm(@PathVariable Long id) {
+        return ResponseEntity.ok(alarmService.deleteAlarm(id));
     }
 
     // mapper AlarmDTO
