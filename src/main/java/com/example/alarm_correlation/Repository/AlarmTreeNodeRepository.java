@@ -24,7 +24,7 @@ public interface AlarmTreeNodeRepository extends JpaRepository<AlarmTreeNode, In
 
     Optional<AlarmTreeNode> findById(Long id);
     // Find the AlarmTreeNode based on the Alarm's name
-    @Query(value = "SELECT * FROM alarm_tree_node as a WHERE a.name = ?1", nativeQuery = true)
+    @Query(value = "SELECT * FROM alarm_tree_node as a WHERE a.name = ?1 LIMIT 1", nativeQuery = true)
     AlarmTreeNode findByName(@Param("name") String name);
 
     @Query("SELECT COUNT(*) FROM AlarmTreeNode")
